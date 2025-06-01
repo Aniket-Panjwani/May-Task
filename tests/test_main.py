@@ -2,17 +2,20 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pytest
+import os
 
 from rest_api.app.main import app, get_db
-from rest_api.app.models import Base
+from rest_api.app.models import Base, User
 
 # Use an in-memory SQLite database for testing
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Create tables once for all tests
-Base.metadata.create_all(bind=engine)
+# Fixture to create tables before any test runs
+@pytest.fixture(scope="session", autouse=True)
+def create_test_tables():
+    Base.metadata.create_all(bind=engine)
 
 # Dependency override
 def override_get_db():
@@ -56,3 +59,20 @@ def test_update_user_email():
     assert response.json() == {"message": "Email updated"}
     updated_users = client.get("/users/", params={"keyword": "updateduser@example.com"}).json()
     assert any(user["email"] == "updateduser@example.com" for user in updated_users)
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup_test_db():
+    yield  # Run all tests first
+    import time
+    time.sleep(1)  # Give time for connections to close (optional, helps on Windows)
+    if os.path.exists("test.db"):
+        try:
+            os.remove("test.db")
+        except PermissionError:
+            pass  # Or log a warning
+
+@pytest.fixture(autouse=True)
+def clear_users_table():
+    # Clear the users table before each test
+    with engine.begin() as conn:
+        conn.execute(User.__table__.delete())
