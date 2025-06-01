@@ -15,9 +15,11 @@ Usage:
 from rest_api.app.database import engine
 from rest_api.app.models import Base
 
+
 def create_tables():
     Base.metadata.create_all(bind=engine)
     print("Database tables created.")
+
 
 if __name__ == "__main__":
     create_tables()

@@ -17,8 +17,8 @@ Dependencies:
 
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
-from app.database import SessionLocal
-from app import crud
+from rest_api.app.database import SessionLocal
+from rest_api.app import crud
 
 app = FastAPI()
 

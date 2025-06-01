@@ -33,9 +33,9 @@ jobs:
 
       - name: Run tests with coverage
         env:
-          PYTHONPATH: ${{ github.workspace }}/rest_api
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          pytest --cov=app --cov-report=term-missing
+          pytest --cov=rest_api/app --cov-report=term-missing
 
       - name: Build Docker image
         run: docker build -t my-fastapi-app .

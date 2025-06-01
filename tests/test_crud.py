@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from rest_api.app import models, crud
-from rest_api.app.database import Base
+from rest_api.app.models import Base
 
 @pytest.fixture(scope="module")
 def db():
