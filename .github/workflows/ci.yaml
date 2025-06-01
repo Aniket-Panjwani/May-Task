@@ -25,6 +25,9 @@ jobs:
           pip install -r requirements.txt
           pip install flake8 pytest pytest-cov
 
+      - name: Make lint.sh executable
+        run: chmod +x lint.sh
+
       - name: Lint with flake8
         run: ./lint.sh
 
