@@ -1,0 +1,18 @@
+# -----------------------------------------------------------------------------
+# requirements.txt
+#
+# Lists Python dependencies for the FastAPI application:
+#   - fastapi: Web framework for building APIs.
+#   - uvicorn: ASGI server for running FastAPI.
+#   - sqlalchemy: ORM for database access.
+#   - pymysql: MySQL database driver.
+# -----------------------------------------------------------------------------
+fastapi
+uvicorn[standard]
+sqlalchemy
+pymysql
+cryptography
+flake8
+pytest
+pytest-cov
+httpx

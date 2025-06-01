@@ -1,0 +1,60 @@
+# -----------------------------------------------------------------------------
+# docker-compose.yaml
+#
+# Defines multi-container services for the application stack:
+#   - db: MySQL 8.0 database with initialization script and persistent storage.
+#   - api: FastAPI application, depends on db, exposes port 8000.
+#
+# Usage:
+#   Run `docker-compose up` to start both the database and API services.
+#
+# Volumes:
+#   - dbdata: Persists MySQL data across container restarts.
+# -----------------------------------------------------------------------------
+
+
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3307:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./db/init-scripts/:/docker-entrypoint-initdb.d/
+
+  api:
+    build: .
+    container_name: fastapi-app
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./rest_api:/app
+    command: >
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    restart: always
+
+volumes:
+  dbdata:
+  sonarqube_data:
+  sonarqube_extensions:
